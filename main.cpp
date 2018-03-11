@@ -12,13 +12,25 @@ using namespace std;
 
 double binary_to_dec(vector<int> &v)
 {
+    cout << "Size: " << v.size() << endl;
     double dec_number = 0;
-    int i = -v.size()/2;
-    int limit = v.size()/2-1;
-    for(int i; i < limit; i++)
+    int lower_limit= -v.size()/2;
+    int upper_limit = v.size()/2-1;
+
+    cout << "lower: " << lower_limit << " upper: " << upper_limit << endl;
+
+    int pos = 0;
+    for(int i = upper_limit; i >= lower_limit; i--)
         {
-            if(v.at(i) = 1) dec_number += pow(2, i);
+            if(v.at(pos) == 1)
+            {
+                dec_number += pow(2, i);
+                double vr = pow(2, i);
+                cout << "vr: " << vr << endl;
+            }
+            pos++;
         }
+    return dec_number;
 }
 void vector_init(vector<int> &v)
 {
@@ -36,7 +48,8 @@ void vector_init(vector<int> &v)
 void print_vector(vector<int> v)
 {
     for(int i = 0; i < v.size(); i++)
-        cout << v.at(i) << " " << endl;
+        cout << v.at(i) << " ";
+    cout << endl;
 
 }
 int main()
@@ -48,4 +61,6 @@ int main()
     vector<int> v;
     vector_init(v);
     print_vector(v);
+    double n = binary_to_dec(v);
+    cout << n << endl;
 }
