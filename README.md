@@ -1,2 +1,2 @@
 # simple-genetic-algorithm
-Simple GA, made for exercise.
+Simple GA, made for exercise. .
