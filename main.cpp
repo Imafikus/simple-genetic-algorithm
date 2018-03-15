@@ -7,7 +7,7 @@
 
 const double MAX_VAL = 65536;
 const double E = 0.001;
-const int VECTOR_SIZE = 4;///size of the binary number, 8 points above and 8 below .
+const int VECTOR_SIZE = 8;///size of the binary number, 8 points above and 8 below .
 const int POPULATION_NUMBER = 8; ///MUST BE EVEN
 
 using namespace std;
@@ -104,6 +104,17 @@ vector<int> swap_bits(vector<int> v1, vector<int> v2, int pivot)
         swap(v1.at(i), v2.at(i) );
     return v1;
 }
+vector<int> mutate_bits(vector<int> v1)
+{
+    ///pick random gene from chromosome and mutate it
+    int k = rand() % v1.size();
+
+    if (v1.at(k) == 0) v1.at(k) = 1;
+    else v1.at(k) = 0;
+
+    return v1;
+
+}
 void crossover(vector<vector<int> >select_chrom, vector<vector<int> > &cross_chrom)///should be vector<vector<int> > type instead of void
 {
     ///add chromosomes from tournament selection to crossover chromosomes
@@ -128,6 +139,24 @@ void crossover(vector<vector<int> >select_chrom, vector<vector<int> > &cross_chr
         ///pick one crossovered chromosome
         vector<int> val = swap_bits(select_chrom.at(k1), select_chrom.at(k2), pivot);
         cross_chrom.push_back(val);
+    }
+}
+void mutation(vector<vector<int> >cross_chrom, vector<vector<int> > &muta_chrom)///should be vector<vector<int> > type instead of void
+{
+    ///add chromosomes from tournament selection to crossover chromosomes
+    for(int i = 0; i < cross_chrom.size(); i++)
+        muta_chrom.push_back(cross_chrom.at(i) );
+
+
+    ///mutate 1/4 of the whole population and add to muta population
+    for(int i = 0; i < POPULATION_NUMBER/4; i++)
+    {
+        /// pick  random index
+        int k1 = rand() % cross_chrom.size();
+
+        ///mutate bit and add it to muta
+        vector<int> val = mutate_bits(cross_chrom.at(k1));
+        muta_chrom.push_back(val);
     }
 }
 
@@ -169,7 +198,15 @@ int main()
 
     cout << "Crossover" << endl;
     for(int i = 0; i < cross_chrom.size(); i++)
-            print_vector(cross_chrom.at(i) );
+        print_vector(cross_chrom.at(i) );
     cout << endl;
 
+    ///mutation
+    vector<vector<int> >muta_chrom;
+    mutation(cross_chrom, muta_chrom);
+
+    cout << "Mutation" << endl;
+    for(int i = 0; i < muta_chrom.size(); i++)
+        print_vector(muta_chrom.at(i) );
+    cout << endl;
 }
