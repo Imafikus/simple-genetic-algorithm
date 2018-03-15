@@ -68,7 +68,7 @@ void print_population(vector<vector<int> > p)
         print_vector(p.at(i) );
 }
 
-///compares 2 chormosomes and returnes one with the greater fitness score
+///compares 2 chormosomes and returns one with the greater fitness score
 vector<int> better_fit(vector<int> p1, vector<int> p2, double fitness)
 {
     double dec_p1 = binary_to_dec(p1);
@@ -93,40 +93,44 @@ void selection(vector<vector<int> > p, double fitness, vector<vector<int> > &sel
         int k2 = rand() % POPULATION_NUMBER;
 
         /// return better
-        if(k1 != k2) val = better_fit(p.at(k1), p.at(k2), fitness);
+        val = better_fit(p.at(k1), p.at(k2), fitness);
         select_chrom.push_back(val);
     }
-}
-void crossover()///should be vector<vector<int> > type instead of void
-{
-    vector<int> v1 = {1, 0, 0, 1, 0, 1, 0};
-    vector<int> v2 = {0, 1, 1, 0, 1, 0, 1};
 
+}
+vector<int> swap_bits(vector<int> v1, vector<int> v2, int pivot)
+{
+    for(int i = 0; i < pivot; i++)
+        swap(v1.at(i), v2.at(i) );
+    return v1;
+}
+void crossover(vector<vector<int> >select_chrom, vector<vector<int> > &cross_chrom)///should be vector<vector<int> > type instead of void
+{
+    ///add chromosomes from tournament selection to crossover chromosomes
+    for(int i = 0; i < select_chrom.size(); i++)
+        cross_chrom.push_back(select_chrom.at(i) );
+
+
+    ///generate random pivot point for crossover
     int pivot = rand() % 8;
     pivot = abs(pivot - rand() % 8);
 
 
-    cout << "pivot " << pivot << endl;
+    ///crossover 1/4 of the whole population and add to crossover population
+    for(int i = 0; i < POPULATION_NUMBER/4; i++)
+    {
+        /// pick first random index
+        int k1 = rand() % select_chrom.size();
 
-    for(int i = 0; i < pivot; i++)
-        swap(v1.at(i), v2.at(i));
+        /// pick second random index
+        int k2 = rand() % select_chrom.size();
 
-
-    cout << "1st vector swaped " << endl;
-    for(int i = 0; i < v1.size(); i++)
-        cout << v1.at(i) << " ";
-    cout << endl;
-
-    cout << "2nd vector swaped " << endl;
-    for(int i = 0; i < v2.size(); i++)
-        cout << v2.at(i) << " ";
-    cout << endl;
-
-
-
-
-
+        ///pick one crossovered chromosome
+        vector<int> val = swap_bits(select_chrom.at(k1), select_chrom.at(k2), pivot);
+        cross_chrom.push_back(val);
+    }
 }
+
 int main()
 {
 
@@ -152,12 +156,20 @@ int main()
     /// tournament selection
     vector<vector<int> >select_chrom;
     selection(population, fitness, select_chrom);
-    cout << "Prosao selection" << endl;
 
 
+    cout << "Selection" << endl;
     for(int i = 0; i < select_chrom.size(); i++)
         print_vector(select_chrom.at(i) );
+    cout << endl;
 
-    crossover();
+    ///crossover
+    vector<vector<int> >cross_chrom;
+    crossover(select_chrom, cross_chrom);
+
+    cout << "Crossover" << endl;
+    for(int i = 0; i < cross_chrom.size(); i++)
+            print_vector(cross_chrom.at(i) );
+    cout << endl;
 
 }
