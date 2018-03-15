@@ -6,7 +6,7 @@
 #include <cmath>
 
 const double MAX_VAL = 65536;
-const double E = 0.001;
+const double Epsilon = 100.001;
 const int VECTOR_SIZE = 8;///size of the binary number, 8 points above and 8 below .
 const int POPULATION_NUMBER = 8; ///MUST BE EVEN
 
@@ -77,7 +77,7 @@ vector<int> better_fit(vector<int> p1, vector<int> p2, double fitness)
     double e1 = abs(dec_p1 - fitness);
     double e2 = abs(dec_p2 - fitness);
 
-    if(e1 >= e2) return p1;
+    if(e1 <= e2) return p1;
     else return p2;
 }
 void selection(vector<vector<int> > p, double fitness, vector<vector<int> > &select_chrom)///FIXME
@@ -160,27 +160,56 @@ void mutation(vector<vector<int> >cross_chrom, vector<vector<int> > &muta_chrom)
     }
 }
 
+///if fitness is okay, returns index of the best chromosome, if not, then returns -2
+void check_fitness(vector<vector<int> > pop, double fitness, double &best_fit, int &best_fit_index, bool &check)
+{
+    check = false;
+    vector<double> pop_dec;
+    for(int i = 0; i < pop.size(); i++)
+    {
+        double dec_val = binary_to_dec(pop.at(i));
+        pop_dec.push_back(dec_val);
+    }
+
+    best_fit = pop_dec.at(0);
+    best_fit_index = 0;
+
+    for(int i = 0; i < pop_dec.size(); i++)
+    {
+        double current_dec_val = pop_dec.at(i);
+        if(abs(current_dec_val - fitness) <= Epsilon)
+        {
+            check = true;
+            if(best_fit > current_dec_val)
+            {
+                best_fit = current_dec_val;
+                best_fit_index = i;
+            }
+        }
+    }
+}
 int main()
 {
 
 
     double number;
     cout << "Pick a number 0 < x <= " << MAX_VAL << endl;
-    //cin >> number;
+    cin >> number;
     //check(number);
 
     ///fitness function, in this case sqrt of the given number
-    double fitness = 30;// sqrt(number);
+    double fitness = sqrt(number);
 
 
     /// generate random seed before any for loop
     srand(time(NULL));
 
-    /// generate random population
+    /// generate random starting population
     vector<vector<int> > population(POPULATION_NUMBER);
     population_init(population);
     print_population(population);
     cout << endl;
+
 
     /// tournament selection
     vector<vector<int> >select_chrom;
@@ -209,4 +238,18 @@ int main()
     for(int i = 0; i < muta_chrom.size(); i++)
         print_vector(muta_chrom.at(i) );
     cout << endl;
+
+
+    double best_fit;
+    int best_fit_index;
+    bool check;
+
+    check_fitness(muta_chrom, fitness, best_fit, best_fit_index, check);
+    if(check == true)
+    {
+        cout << "Good Generation.  " << "Best fit:" << endl;
+        print_vector(muta_chrom.at(best_fit_index) );
+        cout << binary_to_dec(muta_chrom.at(best_fit_index) ) << endl;
+    }
+    else cout << "Bad Generation" << endl;
 }
