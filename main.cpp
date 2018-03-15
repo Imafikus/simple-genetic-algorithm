@@ -5,10 +5,10 @@
 #include <time.h>
 #include <cmath>
 
-const double MAX_VAL = 65536;
-const double Epsilon = 100.001;
-const int VECTOR_SIZE = 8;///size of the binary number, 8 points above and 8 below .
-const int POPULATION_NUMBER = 8; ///MUST BE EVEN
+const double MAX_VAL = 1 << 16;
+const double Epsilon = 0.000000001;
+const int VECTOR_SIZE = 32;///size of the binary number, 8 points above and 8 below .
+const int POPULATION_NUMBER = 16; ///MUST BE EVEN
 
 using namespace std;
 
@@ -160,7 +160,7 @@ void mutation(vector<vector<int> >cross_chrom, vector<vector<int> > &muta_chrom)
     }
 }
 
-///if fitness is okay, returns index of the best chromosome, if not, then returns -2
+///if check is not true, it just ignores best_fit and best_fit_index
 void check_fitness(vector<vector<int> > pop, double fitness, double &best_fit, int &best_fit_index, bool &check)
 {
     check = false;
@@ -191,7 +191,6 @@ void check_fitness(vector<vector<int> > pop, double fitness, double &best_fit, i
 int main()
 {
 
-
     double number;
     cout << "Pick a number 0 < x <= " << MAX_VAL << endl;
     cin >> number;
@@ -201,7 +200,7 @@ int main()
     double fitness = sqrt(number);
 
 
-    /// generate random seed before any for loop
+    /// generate random seed
     srand(time(NULL));
 
     /// generate random starting population
@@ -210,46 +209,49 @@ int main()
     print_population(population);
     cout << endl;
 
-
-    /// tournament selection
-    vector<vector<int> >select_chrom;
-    selection(population, fitness, select_chrom);
-
-
-    cout << "Selection" << endl;
-    for(int i = 0; i < select_chrom.size(); i++)
-        print_vector(select_chrom.at(i) );
-    cout << endl;
-
-    ///crossover
-    vector<vector<int> >cross_chrom;
-    crossover(select_chrom, cross_chrom);
-
-    cout << "Crossover" << endl;
-    for(int i = 0; i < cross_chrom.size(); i++)
-        print_vector(cross_chrom.at(i) );
-    cout << endl;
-
-    ///mutation
-    vector<vector<int> >muta_chrom;
-    mutation(cross_chrom, muta_chrom);
-
-    cout << "Mutation" << endl;
-    for(int i = 0; i < muta_chrom.size(); i++)
-        print_vector(muta_chrom.at(i) );
-    cout << endl;
-
-
+    int generation = 0;
+    bool check;
     double best_fit;
     int best_fit_index;
-    bool check;
 
-    check_fitness(muta_chrom, fitness, best_fit, best_fit_index, check);
+    do
+    {
+
+        /// tournament selection
+        vector<vector<int> >select_chrom;
+        selection(population, fitness, select_chrom);
+
+
+        ///crossover
+        vector<vector<int> >cross_chrom;
+        crossover(select_chrom, cross_chrom);
+
+        ///mutation
+        vector<vector<int> >muta_chrom;
+        mutation(cross_chrom, muta_chrom);
+
+        //double best_fit;
+        //int best_fit_index;
+        //bool check;
+
+        check_fitness(muta_chrom, fitness, best_fit, best_fit_index, check);
+
+
+        ///takes muta_chrom as new population if fitness check fails
+        swap(muta_chrom, population);
+
+        ///clear
+        select_chrom.clear();
+        cross_chrom.clear();
+        muta_chrom.clear();
+
+        generation++;
+    }while(check == false);
+
     if(check == true)
     {
-        cout << "Good Generation.  " << "Best fit:" << endl;
-        print_vector(muta_chrom.at(best_fit_index) );
-        cout << binary_to_dec(muta_chrom.at(best_fit_index) ) << endl;
+        cout << generation << " is good Generation.  " << "Best fit:" << endl;
+        print_vector(population.at(best_fit_index) );
+        cout << binary_to_dec(population.at(best_fit_index) ) << endl;
     }
-    else cout << "Bad Generation" << endl;
 }
