@@ -2,6 +2,10 @@
 Simple GA, made for exercise.
 It will be primary used for educative purposes.
 
+
+
+
+
 Algorithm calculates sqare root of the number, and it doesn't really have fitness function.
 
 Population is vector of chromosomes, and chromosomes are also vectors (of 0s and 1s)
@@ -14,4 +18,4 @@ Mutation takes one random vector from population and randomly changes single bit
 
 After these steps we will have new population, if chromosome from that populations satisfies the criterium, iterations are over, if not, process is repated with the new population.
 
-
+Iteratuons are over when best fit in generation is <= Epsilon, where Epsilon is some fixed accuracy, so algorithm IS NOT CONVERGING.
